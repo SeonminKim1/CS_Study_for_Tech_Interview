@@ -56,4 +56,43 @@
 - 인터럽트 발생시 운영체제가 CPU를 현재 작업에서 빼앗아 커널 루틴에서 실행할 수 있게 함
 - 인터럽트 종료 후 과거 처리하던 문맥을 복구할 수 있도록 이전의 프로세스의 상태를 보관하고 새로운 프로세스의 보관된 상태를 복구하는 작업이 필요
 - 커널은 과거 프로세스의 문맥을 PCB에 저장하고, 실행이 스케줄된 새로운 프로세스의 저장된 문맥을 복구함
-    
+
+## CPU 스케줄러
+
+### FCFS(First Come First Served)
+- 즉 먼저 온 순서대로 처리 / 비선점형(Non-Preemptive) 스케줄링
+- 일단 CPU 를 잡으면 CPU burst 가 완료될 때까지 CPU 를 반환하지 않는다. 할당되었던 CPU 가 반환될 때만 스케줄링이 이루어진다.
+- 문제점
+    - convoy effect / 소요시간이 긴 프로세스가 먼저 도달하여 효율성을 낮추는 현상이 발생한다.
+
+### SJF(Shortest - Job - First)
+- 다른 프로세스가 먼저 도착했어도 CPU burst time 이 짧은 프로세스에게 선 할당
+- 비선점형(Non-Preemptive) 스케줄링
+- 문제점
+    - starvation / 이 스케줄링은 극단적으로 CPU 사용이 짧은 job 을 선호 / 사용 시간이 긴 프로세스는 거의 영원히 CPU 를 할당받을 수 없음
+
+### SRT(Shortest Remaining time First)
+- 새로운 프로세스가 도착할 때마다 새로운 스케줄링이 이루어진다. / 선점형 (Preemptive) 스케줄링
+- 현재 수행중인 프로세스의 남은 burst time 보다 더 짧은 CPU burst time 을 가진 새로운 프로세스가 도착하면 CPU 를 뺏김
+- 문제점
+    - starvation / 새로운 프로세스가 도달할 때마다 스케줄링을 다시하기 때문에 CPU burst time(CPU 사용시간)을 측정할 수가 없다.
+
+### Priority Scheduling
+- 우선순위가 가장 높은 프로세스에게 CPU 를 할당하는 스케줄링 
+- 선점형 스케줄링(Preemptive) 방식
+    - 더 높은 우선순위의 프로세스가 도착하면 실행중인 프로세스를 멈추고 CPU 를 선점한다.
+- 비선점형 스케줄링(Non-Preemptive) 방식
+    - 더 높은 우선순위의 프로세스가 도착하면 Ready Queue 의 Head 에 넣는다.
+- 문제점
+    - starvation / 무기한 봉쇄(Indefinite blocking) / 실행 준비는 되어있으나 CPU 를 사용못하는 프로세스를 CPU 가 무기한 대기하는 상태
+
+### Round Robin
+- 현대적인 CPU 스케줄링 / 각 프로세스는 동일한 크기의 할당 시간(time quantum)을 갖게 된다.
+- 할당 시간이 지나면 프로세스는 선점당하고 ready queue 의 제일 뒤에 가서 다시 줄을 선다.
+- RR은 CPU 사용시간이 랜덤한 프로세스들이 섞여있을 경우에 효율적
+- RR이 가능한 이유는 프로세스의 context 를 save 할 수 있기 때문이다.
+- 장점
+    - Response time이 빨라진다.
+    - n 개의 프로세스가 ready queue 에 있고 할당시간이 q(time quantum)인 경우 각 프로세스는 q 단위로 CPU 시간의 1/n 을 얻는다. 즉, 어떤 프로세스도 (n-1)q time unit 이상 기다리지 않는다.
+    - 프로세스가 기다리는 시간이 CPU 를 사용할 만큼 증가한다.
+    - 공정한 스케줄링이라고 할 수 있다.
